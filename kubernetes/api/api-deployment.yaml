@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: api
+  name: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: api
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        io.kompose.service: api
+    spec:
+      containers:
+        - env:            
+            - name: APPLICATION_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: api
+                  key: application_database
+            - name: MSSQL_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: api
+                  key: mssql_root_username
+            - name: MSSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: api
+                  key: mssql_root_password
+            - name: RabbitMQ__Hostname
+              valueFrom:
+                configMapKeyRef:
+                  name: api
+                  key: rabbitmq_hostname
+            - name: RabbitMQ__Password
+              valueFrom:
+                secretKeyRef:
+                  name: api
+                  key: rabbitmq_password
+            - name: RabbitMQ__Username
+              valueFrom:
+                secretKeyRef:
+                  name: api
+                  key: rabbitmq_username
+            - name: ConnectionStrings__DefaultConnection
+              value: Server=tcp:mssql,1433;Initial Catalog=$(APPLICATION_DATABASE);Persist Security Info=False;User ID=$(MSSQL_ROOT_USERNAME);Password=$(MSSQL_ROOT_PASSWORD);Connection Timeout=30;
+          image: greugreu/pubsub-api:1.1
+          name: api
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: 500m
+            requests:
+              cpu: 200m
+      restartPolicy: Always

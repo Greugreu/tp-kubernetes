@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api
+data:
+  application_database: "RabbitMqDemo"
+  rabbitmq_hostname: "rabbitmq"
